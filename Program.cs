@@ -1,6 +1,5 @@
 using BD_TASK.Configurations;
-using BD_TASK.Services.Countries;
-using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.OpenApi.Models;
 using System.Threading.RateLimiting;
 
 namespace BD_TASK
@@ -12,16 +11,24 @@ namespace BD_TASK
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
-
+            builder.Services.AddEndpointsApiExplorer();
             // Add services to the container.
             builder.Services
                 .AddEndpointsApiExplorer()
-                .AddSwaggerGen()
+                .AddSwaggerGen(
+                    c =>
+                    {
+                        c.SwaggerDoc("v1", new()
+                        { Title = "BD_TASK", Version = "v1",Description = "API for IP Geolocation and Country Blocking" ,
+                        Contact = new OpenApiContact { Name = "Sherif Ahmed Mohamed", Email = "Q0oqU@example.com" } });
+                    }
+                )
                 .AddHttpClient()
                 .AddServices(builder.Configuration);
 
             builder.Services.AddRateLimiter(options =>
             {
+
                 options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
                     RateLimitPartition.GetFixedWindowLimiter(
                         partitionKey: "global",

@@ -13,6 +13,15 @@ namespace BD_TASK.Controllers
     public class IPController(ICountriesService geoService, ILogsService logsService, IIPService iPService)
         : ControllerBase
     {
+        /// <summary>
+        /// Retrieves the geolocation details of a given IP address.
+        /// </summary>
+        /// <param name="ip">Optional. The IP address to look up. If omitted, the client's public IP will be used.</param>
+        /// <returns>
+        /// Returns the geolocation data including country code, name, and ISP.
+        /// If the country is blocked, returns a 409 Conflict response.
+        /// If the IP is not found, returns a 404 Not Found response.
+        /// </returns>
         [HttpGet("lookup")]
         public async Task<IActionResult> GetLocation(string? ip)
         {
@@ -39,6 +48,14 @@ namespace BD_TASK.Controllers
             }
             return Ok(locationData);
         }
+
+        /// <summary>
+        /// Checks if the caller's IP address is from a blocked country.
+        /// </summary>
+        /// <returns>
+        /// Returns a 409 Conflict response if the country is blocked and logs the attempt.
+        /// Returns a 200 OK response if the country is not blocked.
+        /// </returns>
         [HttpGet("check-block")]
         public async Task<IActionResult> CheckIfBlocked()
         {
